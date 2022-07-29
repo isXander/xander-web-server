@@ -1,8 +1,4 @@
 FROM alpine as actions
-RUN \
-  apt-get update && \
-  apt-get install git -y && \
-  ssh-keyscan -t rsa github.com > ~/.ssh/known_hosts
 ADD ./actions/xander-web-server.tar /src/api/
 
 FROM openjdk:17
