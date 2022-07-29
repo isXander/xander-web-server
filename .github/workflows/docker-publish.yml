@@ -1,0 +1,45 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches:
+      - 'prod'
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
+      - '.gitignore'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - name: Build xander-web-server
+        run: |
+          chmod +x ./gradlew
+          ./gradlew distTar
+          mkdir actions
+          cp ./build/distributions/xander-web-server-*.tar ./actions/xander-web-server.tar
+      - name: Build and push Docker images
+        uses: mr-smithers-excellent/docker-build-push@v5
+        with:
+          image: api/xander-web-server
+          tags: ${{ steps.vars.outputs.sha_short }}
+          dockerfile: Dockerfile
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
