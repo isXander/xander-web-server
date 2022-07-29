@@ -1,4 +1,5 @@
 FROM alpine as actions
+RUN apk update && apk add git
 ADD ./actions/xander-web-server.tar /src/api/
 
 FROM openjdk:17
