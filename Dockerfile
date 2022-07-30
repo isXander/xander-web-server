@@ -1,7 +1,7 @@
 FROM alpine as actions
 RUN \
   apk update && \
-  apk add git findutils ssh && \
+  apk add git findutils openssh && \
   mkdir /root/.ssh && chmod 0700 ~/.ssh && \
   ssh-keyscan -t rsa github.com > ~/.ssh/known_hosts
 ADD ./actions/xander-web-server.tar /src/api/
